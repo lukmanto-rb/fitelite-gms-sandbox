@@ -1,0 +1,6 @@
+body { font-family: system-ui, sans-serif; margin: 2rem; color: #1a1a1a; }
+.next-class-card { max-width: 22rem; padding: 1rem 1.25rem; border: 1px solid #ddd; border-radius: 8px; }
+.next-class-card h2 { margin-top: 0; font-size: 1.1rem; }
+.next-class-card dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
+.next-class-card dt { font-weight: 600; }
+.next-class-card dd { margin: 0; }
