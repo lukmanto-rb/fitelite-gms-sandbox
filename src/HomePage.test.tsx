@@ -28,4 +28,13 @@ describe('HomePage', () => {
     expect(screen.getByText('Closed today')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Next class' })).toBeInTheDocument();
   });
+
+  it('shows the opening hours card above the Next class card', () => {
+    render(<HomePage />);
+    const hours = screen.getByRole('heading', { name: "Today's opening hours" });
+    const nextClass = screen.getByRole('heading', { name: 'Next class' });
+    expect(
+      hours.compareDocumentPosition(nextClass) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
 });
