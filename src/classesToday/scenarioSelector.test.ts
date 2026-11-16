@@ -1,13 +1,16 @@
 import { isScenarioSelectorEnabled, resolveScenario } from './scenarioSelector';
 
 describe('test-environment scenario selector', () => {
-  it('is off unless the build flag is exactly "true"', () => {
+  it('is off unless the build mode is exactly "test-env"', () => {
     expect(isScenarioSelectorEnabled({})).toBe(false);
-    expect(isScenarioSelectorEnabled({ VITE_ENABLE_SCENARIO_SELECTOR: 'false' })).toBe(false);
-    expect(isScenarioSelectorEnabled({ VITE_ENABLE_SCENARIO_SELECTOR: 'true' })).toBe(true);
+    expect(isScenarioSelectorEnabled({ MODE: 'production' })).toBe(false);
+    expect(isScenarioSelectorEnabled({ MODE: 'development' })).toBe(false);
+    expect(isScenarioSelectorEnabled({ MODE: 'test-env-x' })).toBe(false);
+    expect(isScenarioSelectorEnabled({ VITE_ENABLE_SCENARIO_SELECTOR: 'true' })).toBe(false);
+    expect(isScenarioSelectorEnabled({ MODE: 'test-env' })).toBe(true);
   });
 
-  it('is off in the default (unflagged) environment', () => {
+  it('is off in the default (test-runner) environment', () => {
     expect(isScenarioSelectorEnabled()).toBe(false);
   });
 

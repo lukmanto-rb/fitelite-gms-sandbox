@@ -37,7 +37,7 @@ Every frame uses a left-aligned column with 24 px padding and 8 px gaps, switchi
 
 ## Review findings and resolution
 
-1. **Fixed: the scenario selector could not be turned on in the test environment.** `VITE_ENABLE_SCENARIO_SELECTOR` was set nowhere, so the localhost release could only show the normal scenario. Added `.env.test-env` and `npm run build:test-env` (`vite build --mode test-env`). The plain `npm run build` keeps the selector off, as tested in `testEnvBuild.test.ts`. **The test environment must be built with `npm run build:test-env`.** After that, use `/FIT-940/?scenario=normal|zero|error`.
+1. **Fixed: the scenario selector could not be turned on in the test environment.** `VITE_ENABLE_SCENARIO_SELECTOR` was set nowhere, so the localhost release could only show the normal scenario. Added `npm run build:test-env` (`vite build --mode test-env`). The selector turns on when Vite's build mode is `test-env`, so no `.env` file is needed. An earlier `.env.test-env` approach was dropped because that file was not in the commit, and the test failed on a clean checkout. The plain `npm run build` keeps the selector off, as tested in `testEnvBuild.test.ts`. **The test environment must be built with `npm run build:test-env`.** After that, use `/FIT-940/?scenario=normal|zero|error`.
 2. No other defects found in data, count, state machine, card, error boundary or home-page placement.
 
 ## Open points (not decided here)
