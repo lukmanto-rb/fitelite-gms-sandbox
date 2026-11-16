@@ -10,5 +10,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/setupTests.ts'],
+    // Process component CSS so layout rules can be asserted (jsdom cannot measure layout).
+    css: { include: [/\.css$/] },
   },
 });

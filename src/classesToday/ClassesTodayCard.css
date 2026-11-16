@@ -1,0 +1,76 @@
+/* FIT-940 Classes today card. Scoped to this card only: existing cards keep their styling (FR-008). */
+.classes-today-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 24px;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.classes-today-card > *,
+.classes-today-card__body > * {
+  margin: 0;
+  max-width: 100%;
+}
+
+.classes-today-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.classes-today-card__heading {
+  line-height: 1.4;
+}
+
+.classes-today-card__heading:focus {
+  outline: none;
+}
+
+.classes-today-card__count {
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.classes-today-card__status {
+  line-height: 1.4;
+  color: #595959; /* 7:1 on white (WCAG 2.2 AA) */
+}
+
+.classes-today-card__status--error {
+  color: #b3261e; /* 6.5:1 on white */
+}
+
+.classes-today-card__retry {
+  font-family: inherit;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 4px;
+  background: #0b57d0; /* white text 6.9:1 */
+  color: #ffffff;
+  cursor: pointer;
+  white-space: normal;
+}
+
+.classes-today-card__retry:focus-visible {
+  outline: 3px solid #0b57d0;
+  outline-offset: 2px;
+}
+
+.classes-today-card__source {
+  line-height: 1.4;
+  color: #595959;
+}
+
+@media (max-width: 767.98px) {
+  .classes-today-card {
+    padding: 16px;
+    width: 100%;
+  }
+}
