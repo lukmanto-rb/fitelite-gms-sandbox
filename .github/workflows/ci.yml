@@ -1,6 +1,7 @@
-# CI for the squad's work (task 46): runs on every push to a squad branch and on every pull
-# request to main. Checks only: type check and build, tests, secret scan, dependency audit.
-# There is no deploy workflow; releases go to the local test environment only.
+# CI for the squad's work (task 46; containers added 19 Nov for the Founder's microservices and
+# Docker requirements): runs on every push to a squad branch and on every pull request to main.
+# Checks only: secret scan, type check, tests, build, dependency audit, then every Docker image is
+# built and the whole product is started and called. No deploy; releases go to the local test environment.
 name: CI
 
 on:
@@ -19,7 +20,7 @@ concurrency:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,27 +32,38 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
-        if: hashFiles('package.json') != ''
         with:
           node-version: 24
           cache: npm
 
       - name: Install
-        if: hashFiles('package.json') != ''
         run: npm ci --no-audit --no-fund
 
       - name: Lint and type check
-        if: hashFiles('package.json') != ''
-        run: npm run lint --if-present && npx tsc --noEmit
+        run: npm run lint --if-present && npm run typecheck
 
       - name: Tests
-        if: hashFiles('package.json') != ''
         run: npm test
 
       - name: Build
-        if: hashFiles('package.json') != ''
         run: npm run build
 
       - name: Dependency audit (high and critical)
-        if: hashFiles('package.json') != ''
         run: npm audit --audit-level=high
+
+      - name: Docker images build and the product starts
+        run: |
+          docker compose -f compose.yaml -f compose.local.yaml up -d --build --wait
+          curl -fsS http://localhost:8088/health && echo
+          curl -fsS http://localhost:8088/ | grep -q 'id="root"'
+          for route in $(docker compose config --format json | jq -r '.services.gateway.environment.ROUTES // ""' | tr ',' ' '); do
+            curl -fsS "http://localhost:8088${route%%=*}/health" && echo
+          done
+
+      - name: Container logs
+        if: failure()
+        run: docker compose logs --tail 100
+
+      - name: Stop the product
+        if: always()
+        run: docker compose down -v
