@@ -39,3 +39,21 @@ characters are kept. Name: 1–100 characters (counted as Unicode code points) a
 | OQ-002 which staff roles | Anyone with a valid session for the workspace may view and add. | gateway `onRequest` hook / service `onRequest` hook |
 | OQ-003 list order | Stable creation order; no sort is promised. | `LIST_ORDER` in `src/app.ts` |
 | OQ-004 same name and speciality | Not blocked. Only one add attempt (one `Idempotency-Key`) = at most one record. | `POST /trainers` in `src/app.ts` (no DB constraint to undo) |
+
+## Web app: Trainers page (T2)
+
+`apps/web/src/trainers/`: `TrainersPage.tsx` (the eight states: Loading, List, Empty, Load Error,
+Validation Error, Adding, Success, Save Error), `trainers.ts` (exact PRD copy, validation, API client),
+`analytics.ts` (the four NFR-008 events; no sink is wired yet, so nothing is sent).
+
+- Navigation: `App.tsx` adds a small GMS navigation (Home, Trainers). Pages use hash routes
+  (`#/trainers`), so the app works under a sub-path such as `/FIT-941/` and `api/trainers/trainers`
+  stays relative and goes through the gateway.
+- One add attempt = one `Idempotency-Key`. "Try again" with unchanged values reuses it; editing the
+  values after an error, or adding after a success, starts a new attempt. A save that gets no answer
+  within 15 s (`SAVE_TIMEOUT_MS`) is shown as Save Error; retrying it is safe.
+- Interim, not decided: Speciality is a text input (`SPECIALITY_CONTROL`, OQ-001); no role check
+  in the page (OQ-002); rows in server order, no client sort (OQ-003); no matching-name message
+  (OQ-004).
+- Sign-in: the page sends the `gms_session` cookie. The web app has no sign-in screen yet; without a
+  session the gateway answers 401 and the page shows "Couldn't load trainers. Try again."
