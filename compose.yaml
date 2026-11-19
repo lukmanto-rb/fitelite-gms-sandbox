@@ -10,8 +10,12 @@ services:
       PORT: "8080"
       WEB_URL: http://web:80
       # One entry per service: /api/<service>=http://<service>:3000 (added by npm run new-service).
-      ROUTES: ""
+      ROUTES: "/api/trainers=http://trainers:3000"
+      # Signs GMS sign-in sessions; set GMS_SESSION_SECRET (32+ characters) in .env, never here.
+      # Without it the gateway refuses every /api request (fails closed).
+      SESSION_SECRET: ${GMS_SESSION_SECRET:-}
     depends_on:
+      trainers: { condition: service_healthy }
       web: { condition: service_healthy }
     restart: unless-stopped
 
@@ -19,8 +23,31 @@ services:
     build: { context: ., dockerfile: apps/web/Dockerfile }
     restart: unless-stopped
 
+  trainers:
+    build: { context: ., dockerfile: services/trainers/Dockerfile }
+    environment:
+      PORT: "3000"
+      DATABASE_URL: postgres://trainers:trainers@trainers-db:5432/trainers
+    depends_on:
+      trainers-db: { condition: service_healthy }
+    restart: unless-stopped
+
+  trainers-db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: trainers
+      POSTGRES_PASSWORD: trainers
+      POSTGRES_DB: trainers
+    volumes: [trainers-db:/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trainers -d trainers"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
   # >>> services: npm run new-service <name> adds each service and its own database above this line
 
 volumes:
+  trainers-db: {}
   # >>> volumes: one per service database, added by npm run new-service
-  {}
