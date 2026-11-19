@@ -1,0 +1,4 @@
+# For trying the product on your own machine: publishes the gateway on http://localhost:8088.
+services:
+  gateway:
+    ports: ["127.0.0.1:8088:8080"]

@@ -1,0 +1,26 @@
+# Fitelite GMS: the whole product in Docker. Start it locally with
+#   docker compose -f compose.yaml -f compose.local.yaml up --build
+# and open http://localhost:8088. The gateway is the only entry point; nothing else is published.
+name: fitelite-gms
+
+services:
+  gateway:
+    build: { context: ., dockerfile: services/gateway/Dockerfile }
+    environment:
+      PORT: "8080"
+      WEB_URL: http://web:80
+      # One entry per service: /api/<service>=http://<service>:3000 (added by npm run new-service).
+      ROUTES: ""
+    depends_on:
+      web: { condition: service_healthy }
+    restart: unless-stopped
+
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    restart: unless-stopped
+
+  # >>> services: npm run new-service <name> adds each service and its own database above this line
+
+volumes:
+  # >>> volumes: one per service database, added by npm run new-service
+  {}
