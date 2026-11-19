@@ -8,7 +8,8 @@
 - The gateway refuses every `/api/...` request without a valid GMS session (`401 {"error":"unauthenticated"}`).
   A session is a token in the `gms_session` cookie or `Authorization: Bearer`, signed with
   `SESSION_SECRET` (`services/gateway/src/session.ts`). Without a secret of 32+ characters the
-  gateway refuses all API requests (fails closed). Set it as `GMS_SESSION_SECRET` in `.env`; never commit it.
+  gateway refuses all API requests (fails closed). The only exception is each service's own
+  health check (`GET /api/<service>/health`, exact path), which carries no data. Set it as `GMS_SESSION_SECRET` in `.env`; never commit it.
 - The gateway passes the workspace from the session in `x-gms-workspace` (and the staff id in
   `x-gms-user`), removing any `x-gms-*` header a browser sent, and does not forward the token.
 - The trainers service refuses requests without `x-gms-workspace` and only reads and writes rows

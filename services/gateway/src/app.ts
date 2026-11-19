@@ -56,8 +56,14 @@ export async function buildGateway(config: GatewayConfig): Promise<FastifyInstan
   app.decorateRequest('gmsSession', null);
   // Every /api/... request needs a valid session, or it is refused here and never reaches a
   // service. Web app pages stay reachable, so navigation keeps working.
+  // The one exception is each service's own health check (GET/HEAD <prefix>/health, exact path):
+  // it carries no business data and must stay reachable for liveness checks. It still reaches the
+  // service with no identity headers.
+  const healthPaths = new Set(Object.keys(config.routes).map((prefix) => `${prefix}/health`));
   app.addHook('onRequest', async (req, reply) => {
     if (!req.url.startsWith('/api/')) return;
+    const path = req.url.split('?')[0]!;
+    if ((req.method === 'GET' || req.method === 'HEAD') && healthPaths.has(path)) return;
     req.gmsSession = verifySession(tokenOf(req.headers), config.sessionSecret);
     if (!req.gmsSession) return reply.code(401).send({ error: 'unauthenticated' });
   });

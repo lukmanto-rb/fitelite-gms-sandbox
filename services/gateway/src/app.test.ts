@@ -66,6 +66,25 @@ describe('gateway', () => {
       expect(classesHits()).toBe(before);
     });
 
+    it("lets each service's own health check through without a session, and nothing else", async () => {
+      const app = await buildGateway({ webUrl, routes });
+      const before = classesHits();
+      const health = await app.inject({ url: '/api/classes/health', headers: { 'x-gms-workspace': 'gym-a' } });
+      expect(health.statusCode).toBe(200);
+      expect(health.json()).toMatchObject({ name: 'classes', path: '/health', ws: null, user: null });
+      expect(classesHits()).toBe(before + 1);
+      for (const req of [
+        { url: '/api/classes/health/x' },
+        { url: '/api/classes/healthz' },
+        { url: '/api/classes/today?/health' },
+        { url: '/api/other/health' },
+        { url: '/api/classes/health', method: 'POST' as const },
+      ]) {
+        expect((await app.inject(req)).statusCode).toBe(401);
+      }
+      expect(classesHits()).toBe(before + 1);
+    });
+
     it('passes only the workspace from the session, ignoring one the browser names, and keeps tokens at the gateway', async () => {
       const app = await buildGateway({ webUrl, routes, sessionSecret: secret });
       const res = await app.inject({ url: '/api/classes/today', headers: { ...bearer('gym-a', 'staff-7'), 'x-gms-workspace': 'gym-b', 'x-gms-user': 'someone-else' } });
