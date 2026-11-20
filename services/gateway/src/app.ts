@@ -7,6 +7,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import proxy from '@fastify/http-proxy';
 import type { IncomingHttpHeaders } from 'node:http';
 import { tokenOf, verifySession, type Session } from './session.js';
+import { registerSignIn } from './signIn.js';
 
 /** Headers the gateway sets for services from a verified session; a browser can never set them. */
 export const WORKSPACE_HEADER = 'x-gms-workspace';
@@ -72,6 +73,8 @@ export async function buildGateway(config: GatewayConfig): Promise<FastifyInstan
   };
 
   app.get('/health', async () => ({ status: 'ok', routes: Object.keys(config.routes) }));
+  // Browser sign-in with the same signed session (sign-in, sign-out pages; see signIn.ts).
+  await registerSignIn(app, config.sessionSecret);
   // Longest prefixes first, so /api/classes/admin wins over /api/classes.
   for (const [prefix, upstream] of Object.entries(config.routes).sort((a, b) => b[0].length - a[0].length)) {
     await app.register(proxy, { upstream, prefix, rewritePrefix: '', replyOptions } as never);

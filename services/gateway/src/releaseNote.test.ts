@@ -14,11 +14,13 @@ const section = (title: string) => {
 };
 
 describe('FIT-941 release note v0.3.0', () => {
-  it('states plainly that browser adding is blocked by the missing sign-in screen, and the first test step matches', () => {
-    expect(section('Known issues')).toMatch(/Adding trainers in the browser is blocked: there is no sign-in screen/);
+  it('explains the sign-in code for the test release, and the first test step signs in at the sign-in page', () => {
+    expect(section('Known issues')).toMatch(/Sign-in on the test release uses a sign-in code/);
+    expect(note).not.toMatch(/no sign-in screen/);
     const firstStep = section('How to test').split('\n').find((l) => l.startsWith('1. '))!;
     expect(firstStep).not.toMatch(/sign in as/i);
-    expect(firstStep).toMatch(/no sign-in screen yet, so you cannot sign in/);
+    expect(firstStep).toContain('http://localhost:8080/FIT-941/sign-in');
+    expect(runbook).toContain('## Sign in in the browser');
   });
 
   it('drops "validation not recorded", reports validation honestly and gives a result for AC-001 to AC-020', () => {

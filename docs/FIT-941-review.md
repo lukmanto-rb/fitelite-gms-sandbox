@@ -64,6 +64,12 @@ All eight frames are built in `TrainersPage.tsx` (the state map is in its header
 ## Review findings
 
 1. **Blocking for the T4 live check: the test release has no way to sign in.** The PRD assumes an existing GMS sign-in (AS-001, DEP-002), but this repo has none. T1 added a signed-session check at the gateway, but there is no sign-in screen or other way to get a session. `GMS_SESSION_SECRET` is also unset by default, so the gateway refuses every `/api` request. At http://localhost:8080/FIT-941/, the page will open, but it will always show "Couldn't load trainers. Try again." Nobody can add a trainer there or check refresh and second-session persistence (AC-017, the T4 smoke test). This is secure and correct behaviour, but it is not demonstrable. Building a sign-in is outside the PRD and plan, so this is **raised to the GM for a decision** and was not built here.
+   **Update, validation fix 1 (AC-017):** browser sign-in now uses the same signed session. The
+   gateway serves `sign-in` (paste a sign-in code made with `node dist/signInCode.js <staff> <workspace>` in
+   the gateway container) and `sign-out`, and sets the `gms_session` cookie (HttpOnly, SameSite=Lax).
+   Tests: `services/gateway/src/signIn.test.ts`, plus the end-to-end test
+   `tests/e2e/src/trainers.signedIn.e2e.test.tsx` (real web app, gateway and trainers service; sign in, add,
+   refresh, second browser, and AC-018 on the same path). The MacBook steps are in `FIT-941-release.md`.
 2. No other defects found in the service (validation, idempotency, workspace scoping, error codes), the gateway session check or the page's state handling. No code was changed in T3.
 
 ## Open questions: interim behaviour only (still waiting on Rian)

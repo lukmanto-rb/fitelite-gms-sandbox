@@ -30,7 +30,7 @@ v0.3.0 adds a Trainers page to the Gym Management System (GMS). Staff can open T
 ## Known issues
 
 - Trainers cannot be edited or deleted in this release. The list is view and add only.
-- **Adding trainers in the browser is blocked: there is no sign-in screen.** The server only accepts signed-in staff, and this build has no way to sign in from the browser. Until a sign-in is added, the Trainers page opens but shows "Couldn't load trainers. Try again.", and trainers cannot be added or listed in the browser. The sign-in approach for the test environment has been reported as decided, but it is not part of this build. Adding, listing, refresh and access refusal can still be checked with the smoke check below.
+- **Sign-in on the test release uses a sign-in code.** There is no username-and-password screen. Staff open http://localhost:8080/FIT-941/sign-in and paste a sign-in code made on the MacBook (steps in docs/FIT-941-release.md, "Sign in in the browser"). Without a valid code, the Trainers page shows "Couldn't load trainers. Try again." and trainers cannot be added or listed.
 - **OQ-001, Speciality (free text or fixed list), not yet decided.** For now, Speciality is a required free-text field with no list of options.
 - **OQ-002, which staff may add trainers, not yet decided.** For now, anyone signed in to the gym's GMS can view and add trainers. There is no separate view-only access.
 - **OQ-003, list order, not yet decided.** For now, trainers are shown in the order they were added. No sort order (such as alphabetical) is promised.
@@ -56,13 +56,13 @@ v0.3.0 adds a Trainers page to the Gym Management System (GMS). Staff can open T
    ```
 
 6. Read the result. Each line starts with PASS or FAIL. All lines should say PASS. If any line says FAIL, copy the whole output and send it to the GM.
-7. Open http://localhost:8080/FIT-941/#/trainers in the browser.
+7. Sign in in the browser (docs/FIT-941-release.md, "Sign in in the browser"), then open http://localhost:8080/FIT-941/#/trainers.
 
 The smoke check adds one test trainer called "Smoke check" plus a number, with the speciality "Release check", in a separate test gym. Real gym data is not touched.
 
 ## How to test
 
-1. Open http://localhost:8080/FIT-941/#/trainers. There is no sign-in screen yet, so you cannot sign in (see Known issues). Until sign-in is added, the page shows "Couldn't load trainers. Try again." and the steps below that load or add trainers cannot be done in the browser; the smoke check covers adding, listing, refresh and access refusal instead.
+1. Sign in first: make a sign-in code and paste it at http://localhost:8080/FIT-941/sign-in (steps in docs/FIT-941-release.md, "Sign in in the browser"). You then land on http://localhost:8080/FIT-941/#/trainers.
 2. Select "Trainers" in the navigation. Check that the "Add trainer" heading, the Name and Speciality fields, the text "Both fields are required." and the "Add trainer" button are shown, and that other navigation is unchanged.
 3. With no trainers saved, check that "No trainers yet" and "Add your first trainer using the form." appear.
 4. Select "Add trainer" with empty or space-only fields. Check that "Enter a name." and/or "Enter a speciality." appear, and that no trainer is added.
@@ -102,7 +102,7 @@ Results per acceptance criterion. "Automated" means checked by the passing tests
 | AC-014 | Save failure keeps entries and the list, shows "Try again" | Passed | Not run |
 | AC-015 | A failed save retry keeps entries and the list | Passed | Not run |
 | AC-016 | Retry after a lost confirmation gives one trainer, not two | Passed | Not run (also in the smoke check) |
-| AC-017 | Trainer still there after refresh and on another computer | Passed (a second signed-in session stands in for another computer) | Not run (in the smoke check; browser check blocked by sign-in) |
+| AC-017 | Trainer still there after refresh and on another computer | Passed (a second signed-in session stands in for another computer) | Not run (in the smoke check and the two-browser steps in docs/FIT-941-release.md) |
 | AC-018 | Signed-out or other-gym access is refused | Passed | Not run (also in the smoke check) |
 | AC-019 | Works at 320 px, by keyboard and with a screen reader | Passed (layout, focus, labels and announcements in code) | Not run (manual browser and screen-reader check still needed) |
 | AC-020 | Analytics contain no names, specialities or personal data | Passed | Not run |
